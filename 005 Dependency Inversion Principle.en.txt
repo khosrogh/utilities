@@ -1,0 +1,113 @@
+
+Chapter five. Dependency inversion principle.
+This is the final topic of this course, it provides the mechanism behind most other principles.
+What is its definition?
+High level modules should not depend on low level modules.
+Instead, they should depend on abstractions.
+This can be difficult to grasp.
+Let me show you what it means.
+Your program starts in main.
+Main calls function f in module M.
+M calls function g in module N.
+I have a question for you. Is this an object oriented design?
+The answer is we don't know.
+It could be anything, it could be a procedural design.
+It could be OO. All we know is that high level modules call functions in lower level modules.
+The higher level modules depend on the lower level modules.
+In order for main to use module M, main needs to import M.
+In order for module M to use module N, M needs to import N.
+We call this a source code dependancy.
+High level modules know about the lower level modules. They target concrete classes.
+This design comes with two problems.
+Concrete classes are volatile.
+Depending on concrete classes breaks the open-close principle.
+What does the first problem mean?
+Concrete things change a lot.
+Abstract things change much less frequently.
+If high level modules depend on low level modules, changes in low level modules trigger a recompile
+in all higher level modules.
+Historically, this was a problem because of compile times. In 2021
+this is not a big problem anymore.
+The second problem is more serious.
+So where do things start to go wrong?
+Imagine the software for a cash register. Each time a purchase is made, a receipt is printed.
+I create a class called Reporting. The class contains a method called print_receipt that takes a string
+with the receipt text.
+At this point, we need to send the text to a printer.
+We will use the internal cash register printer for this. Let's create a class for it.
+A module printers.py is created and has a class CashRegisterPrinter.
+How do we use the class?
+The reporting module needs to import from the printers module.
+Then it instantiates a new CashRegisterPrinter. This code will work, but we have created a dependency
+on a concrete class.
+This is a violation of the dependency inversion principle.
+And by doing so, it also violates the open-closed principle.
+Let me demonstrate this by adding a new printer.
+Instead of printing to the internal cash register printer, a laser printer will be used.
+Let's create a class for the laser printer in printers.py.
+printers.py now has two printer classes.
+One for the internal cash register printer and one for the laser printer. We have extended the software
+but need to modify existing code to use it.
+In order to change the printer, the reporting module needs to be changed.
+This is a violation of the open-closed principle.
+This time it is caused because we depend on concrete classes instead of on abstractions.
+So how do we solve the problem?
+Let me show a dependency diagram of the current code.
+Main imports Reporting.
+Reporting imports LaserPrinter.
+Now you are going to see what inversion means in dependency inversion.
+The first thing we do is to introduce a printer interface. This interface will just exist in our design.
+In a dynamic language like Python, we do not physically have to implement interfaces to get polymorphism.
+LaserPrinter inherits the printer interface.
+And the reporting module depends on the printer interface.
+All arrows used to point downwards. Modules depended on lower level modules.
+But now Reporting depends on an interface, it depends on something abstract.
+LaserPrinter depends on that same abstraction.
+This is a break in the dependency chain.
+It does not matter what happens in LaserPrinter. The reporting module doesn't even know there is such
+a thing as a laser printer.
+All it knows is that there is something with a method called print_receipt.
+So how do we hook this up in Python?
+Let's start from the top and implement main.
+The first thing you notice is that all the dependencies are imported here.
+A LaserPrinter object is instantiated.
+And then a Reporting object. And this is the place where the printer needs to be injected.
+To do so, the reporting class gets a class initializer that allows for the printer object to be injected.
+Let me show the code.
+A dunder init method is added and the printer argument is stored in self. self.printer now holds
+an instance of a printer object.
+This printer object can now be used to print the receipt.
+Notice there are no imports and no object instantiation is happening here.
+There is no dependency on a concrete class.
+We can now pass the printer object to the reporting class.
+Finally, print_receipt is called on the reporting object. We have now solved the dependency inversion
+principle violation.
+And this is the point where we start to benefit when the requirements change.
+For example, what happens if we switch back to the internal cash register printer?
+We swap the laser printer for a cash register printer in main.
+The reporting class does not need to be modified anymore to support another printer.
+Perhaps you are wondering what we have gained here. We still have to change code to support a new printer.
+That's true.
+The open-closed principle does not prevent code modification, but it confines it to specific places.
+Main is an excellent place to create the dependency tree that will be used in the rest of the program.
+If you are worried about an explosion of import statements in main, there are techniques to help preventing
+that.
+You can use factories.
+A factory is an object that creates new objects. That way you can move the logic out of main and into
+a factory.
+If you are interested in this, you could watch my course on the Python object model where I show an
+example of a factory.
+Some people like to use IOC container frameworks to manage the dependencies for them. The dependency
+tree is configured in a config file and resolved by the framework when needed.
+Personally, I favor writing out the dependency tree in source code. This gives me full control over
+the life span of each and every object in the code.
+As always, there is a solution for each scenario and you have to find out what works best for you.
+Conclusion. The dependency inversion principle is the mechanism behind many of the other principles.
+Especially the open-closed principle.
+It allows us to depend on interfaces rather than upon concrete classes.
+The symptoms of violations of the dependency inversion principle are
+Object instantiation in lower level modules and the import statements needed for these instantiations.
+These violations can be solved by injecting dependencies.
+And that concludes the last chapter of this course. You have now seen the five S.O.L.I.D. principles.
+Now let's look at the principles as a whole.
+What are the main lessons to be learned?

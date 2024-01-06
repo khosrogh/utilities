@@ -1,0 +1,568 @@
+1
+00:00:01,700 --> 00:00:05,420
+Chapter one. Single responsibility principle.
+
+2
+00:00:06,540 --> 00:00:10,680
+This is the first of the five principles. What is it?
+
+3
+00:00:12,330 --> 00:00:19,050
+The idea of the single responsibility principle is that classes or modules only have a single reason
+
+4
+00:00:19,050 --> 00:00:23,360
+to change. The word reason might be confusing here.
+
+5
+00:00:24,240 --> 00:00:26,350
+A class can do more than one thing
+
+6
+00:00:26,370 --> 00:00:31,090
+obviously. This principle is not about keeping classes small.
+
+7
+00:00:31,920 --> 00:00:37,610
+The goal here is to prevent a class from changing all the time for all sorts of reasons.
+
+8
+00:00:39,300 --> 00:00:47,630
+I'll give you an example. Class one contains functionality A and functionality B. If you change A,
+
+9
+00:00:48,030 --> 00:00:52,110
+you can break B just from the fact that they share the same class.
+
+10
+00:00:53,910 --> 00:00:59,400
+You have seen these kinds of problems, big classes with lots of code are intimidating.
+
+11
+00:00:59,760 --> 00:01:04,520
+When you change something, you just have to hope you did not break something else.
+
+12
+00:01:05,130 --> 00:01:06,730
+But there are more problems.
+
+13
+00:01:07,140 --> 00:01:08,610
+Let me give you a list of them.
+
+14
+00:01:09,750 --> 00:01:17,700
+One. Classes get big when they have many responsibilities. Naming the class is hard and finding code
+
+15
+00:01:17,700 --> 00:01:18,260
+is hard.
+
+16
+00:01:19,460 --> 00:01:27,890
+Two. Mixing responsibilities. We will look at an example of an employee class that mixes responsibilities
+
+17
+00:01:27,890 --> 00:01:33,080
+and find out it is dangerous to change code around unrelated other code.
+
+18
+00:01:35,370 --> 00:01:43,590
+Three. Dependencies on libraries. I will give you an example, where a harmless dependancy in one class
+
+19
+00:01:43,980 --> 00:01:47,130
+starts to invade another unrelated class.
+
+20
+00:01:48,810 --> 00:01:54,670
+Let's start with a common example of the single responsibility principle and how it is violated.
+
+21
+00:01:55,260 --> 00:01:59,040
+It concerns a class that does too many different things.
+
+22
+00:02:01,780 --> 00:02:06,190
+Look at the employee class. It stores a name and salary.
+
+23
+00:02:09,190 --> 00:02:13,450
+The employee class also has some business logic to raise the salary.
+
+24
+00:02:14,570 --> 00:02:17,870
+Until here, we all consider this to be business logic.
+
+25
+00:02:19,150 --> 00:02:22,720
+But the class can also save an employee as XML.
+
+26
+00:02:23,950 --> 00:02:26,110
+And print a report of the employee.
+
+27
+00:02:27,650 --> 00:02:32,570
+The name of the class implies an employee entity, but the class does more than that.
+
+28
+00:02:33,970 --> 00:02:41,770
+It also handles storage and reporting. You would not expect this by just looking at the class name.
+
+29
+00:02:43,410 --> 00:02:46,600
+The class name should tell us what it is responsible for.
+
+30
+00:02:47,190 --> 00:02:54,090
+If you see big class names like this, it might be the first clue that the class is doing too many different
+
+31
+00:02:54,090 --> 00:02:54,720
+things.
+
+32
+00:02:56,010 --> 00:03:01,110
+As you see, naming is hard, but also finding code in such classes is hard.
+
+33
+00:03:01,940 --> 00:03:05,180
+And our problems are only starting to get bigger from here.
+
+34
+00:03:06,570 --> 00:03:10,330
+Clearly, the employee class has mixed responsibilities.
+
+35
+00:03:10,860 --> 00:03:13,770
+Let's look at a practical problem that arises.
+
+36
+00:03:17,050 --> 00:03:24,520
+Look at the employee class again. For this example, I have removed the reporting function. Employee now
+
+37
+00:03:24,520 --> 00:03:29,050
+has two responsibilities: Business logic and storage logic.
+
+38
+00:03:30,670 --> 00:03:38,350
+I implement the save_as_xml method. It opens the file emp.xml and writes XML to it.
+
+39
+00:03:39,520 --> 00:03:40,700
+Look at the file name.
+
+40
+00:03:41,170 --> 00:03:48,160
+It is hard coded. To make it more flexible for users of the class, the file name will be defined as
+
+41
+00:03:48,160 --> 00:03:50,740
+a class variable at the top of the class.
+
+42
+00:03:52,170 --> 00:03:53,670
+The variable is created.
+
+43
+00:03:55,480 --> 00:03:56,830
+And used in the function.
+
+44
+00:03:59,450 --> 00:04:05,930
+Notice how the code for the two responsibilities is now scattered all over the class. And there is a
+
+45
+00:04:05,930 --> 00:04:07,130
+new subtle problem.
+
+46
+00:04:08,780 --> 00:04:16,010
+The class variable with the file name is only used by the storage part. User of this class start reading
+
+47
+00:04:16,010 --> 00:04:22,970
+the code from the top and asked themselves, why does this class know anything about XML file names?
+
+48
+00:04:25,400 --> 00:04:31,080
+The user now has to scan the code to find out it has nothing to do with the business logic, but with
+
+49
+00:04:31,080 --> 00:04:33,680
+the later added storage responsibility.
+
+50
+00:04:35,010 --> 00:04:38,100
+This problem will get worse when we change the class again.
+
+51
+00:04:40,030 --> 00:04:46,660
+At this point, the employee can be saved as XML, but now we want to replace XML with JSON.
+
+52
+00:04:48,480 --> 00:04:52,140
+The first thing we do is remove the save_as_xml function.
+
+53
+00:04:53,770 --> 00:04:56,890
+That cleans up to code, but wait a minute.
+
+54
+00:04:58,780 --> 00:05:01,630
+We forgot the class variable xml_filename.
+
+55
+00:05:02,720 --> 00:05:05,910
+Imagine someone looking at this code in six months.
+
+56
+00:05:06,560 --> 00:05:09,560
+Will this person be brave enough to delete the variable?
+
+57
+00:05:11,460 --> 00:05:13,980
+You see that when responsibilities are mixed,
+
+58
+00:05:14,280 --> 00:05:20,580
+it is not only harder to add new code, but you can also not safely delete code and be sure you have
+
+59
+00:05:20,580 --> 00:05:21,960
+not forgotten something.
+
+60
+00:05:24,300 --> 00:05:30,840
+Look at the employee class diagram. We have removed the save_as_xml method, but need to replace it
+
+61
+00:05:30,840 --> 00:05:32,730
+with the save_as_json method.
+
+62
+00:05:34,660 --> 00:05:39,550
+But if we add the save_as_json method, it will cause the same problems as before.
+
+63
+00:05:42,080 --> 00:05:45,530
+Clearly, we are violating the single responsibility principle.
+
+64
+00:05:46,100 --> 00:05:52,490
+I will show you even more violations, but before I do, I'd like to show you how the problem is solved.
+
+65
+00:05:55,740 --> 00:06:01,590
+We know that the class is doing too many things and we need to split it up in multiple classes.
+
+66
+00:06:02,940 --> 00:06:05,430
+First, we identify the responsibilities.
+
+67
+00:06:07,150 --> 00:06:09,730
+The employee class contains business logic
+
+68
+00:06:11,540 --> 00:06:16,790
+and storage logic. The storage logic will be moved to its own class.
+
+69
+00:06:19,690 --> 00:06:27,880
+When classes are split up, new problems are introduced:  Missing dependencies. The save_as_json method
+
+70
+00:06:27,880 --> 00:06:30,460
+is now in the EmployeeStorage class.
+
+71
+00:06:32,160 --> 00:06:36,700
+How does it get access to an employee object? For now
+
+72
+00:06:36,840 --> 00:06:38,730
+We choose the simplest solution.
+
+73
+00:06:39,240 --> 00:06:42,390
+We pass it when we call the save_as_json function.
+
+74
+00:06:45,080 --> 00:06:47,030
+Here is the employee storage class.
+
+75
+00:06:47,810 --> 00:06:55,460
+One thing is immediately clear. Every line of code in this class has something to do with employee storage.
+
+76
+00:06:57,620 --> 00:07:02,750
+The employee class is stripped of storage logic and only contains business logic.
+
+77
+00:07:03,800 --> 00:07:06,020
+And how do we connect both classes?
+
+78
+00:07:08,010 --> 00:07:09,360
+We do this in main.
+
+79
+00:07:11,810 --> 00:07:13,910
+Main imports both classes.
+
+80
+00:07:16,060 --> 00:07:20,590
+An employee object is created, followed by an employee storage object.
+
+81
+00:07:22,260 --> 00:07:28,440
+And finally the save_as_json method is called and an employee object is passed to the function.
+
+82
+00:07:31,720 --> 00:07:35,410
+Here is a dependency diagram of the program we just created.
+
+83
+00:07:36,610 --> 00:07:43,780
+As I said before, OO allows us to manage our dependencies and the S.O.L.I.D. principles use this kind
+
+84
+00:07:43,780 --> 00:07:45,220
+of dependency management.
+
+85
+00:07:47,770 --> 00:07:53,740
+We will discuss dependency management further in the dependency inversion principle chapter.
+
+86
+00:07:54,720 --> 00:07:57,960
+But now we continue with the single responsibility principle.
+
+87
+00:08:01,210 --> 00:08:05,860
+At this point, we have achieved single responsibility in both classes.
+
+88
+00:08:07,560 --> 00:08:12,460
+But we have to be careful because we can violate the principle again very easy.
+
+89
+00:08:13,410 --> 00:08:15,180
+Let me give you another example.
+
+90
+00:08:17,220 --> 00:08:22,560
+Sometimes we violate the single responsibility principle in very subtle ways.
+
+91
+00:08:23,710 --> 00:08:29,830
+In the following example, extra responsibilities sneak in through an external library.
+
+92
+00:08:32,510 --> 00:08:34,310
+Look at the save_as_json method.
+
+93
+00:08:35,900 --> 00:08:39,920
+The method constructs the JSON manually, and this is error prone.
+
+94
+00:08:40,670 --> 00:08:46,160
+You found a library online that serializes and saves JSON in a single line of code.
+
+95
+00:08:48,740 --> 00:08:51,140
+All we need to do is import jsonlibrary.
+
+96
+00:08:52,640 --> 00:08:54,860
+And call jsonlibrary.save.
+
+97
+00:08:56,580 --> 00:08:58,760
+We run the program and get an error.
+
+98
+00:09:03,370 --> 00:09:11,200
+The JSON library tries to serialize the employee object. To do this, it searches for serializable
+
+99
+00:09:11,200 --> 00:09:16,540
+attributes. But we have not marked name and salary as serializable.
+
+100
+00:09:17,740 --> 00:09:18,440
+No problem.
+
+101
+00:09:19,300 --> 00:09:24,900
+The error shows that all we need to do is to decorate the attributes with @jsonserializable.
+
+102
+00:09:25,600 --> 00:09:26,620
+Let's do it now.
+
+103
+00:09:28,170 --> 00:09:31,980
+I add the two decorators and a question rises.
+
+104
+00:09:33,450 --> 00:09:35,390
+Where do the decorators come from?
+
+105
+00:09:36,720 --> 00:09:43,500
+The answer is that they come from the JSON library. That means we have to import jsonlibrary in the
+
+106
+00:09:43,500 --> 00:09:44,520
+employee class.
+
+107
+00:09:45,590 --> 00:09:52,360
+And this makes it very clear. Our goal was to get rid of all storage functionality in the employee class
+
+108
+00:09:52,730 --> 00:09:58,430
+and suddenly the employee is polluted with knowledge about JSON serialisation.
+
+109
+00:09:59,760 --> 00:10:06,180
+Think about the complications here, it becomes impossible to move the employee entity to another project
+
+110
+00:10:06,270 --> 00:10:13,710
+without installing the JSON library here. And whenever JSON serialisation becomes obsolete, we need
+
+111
+00:10:13,710 --> 00:10:19,350
+to make changes to the employee class, which should be unaware of all things related to JSON.
+
+112
+00:10:20,640 --> 00:10:22,940
+How would you solve a problem like this?
+
+113
+00:10:25,370 --> 00:10:29,870
+There is only one way to solve it without breaking the single responsibility principle.
+
+114
+00:10:31,460 --> 00:10:36,530
+On the left, you see the employee class that should not know anything about JSON.
+
+115
+00:10:38,060 --> 00:10:45,950
+On the right, there is the employee storage class that needs a serializable employee object. The boundary
+
+116
+00:10:45,950 --> 00:10:50,030
+in the middle separates the entities from the storage logic.
+
+117
+00:10:53,000 --> 00:10:56,150
+A new class has created: JSONEmployee.
+
+118
+00:10:57,480 --> 00:11:05,190
+It is also hosted in the storage module. Its only purpose is to provide a copy of the employee data
+
+119
+00:11:05,190 --> 00:11:08,760
+attributes and mark them JSON serializable.
+
+120
+00:11:11,370 --> 00:11:16,500
+Each data attribute is copied from the employee object to the JSONEmployee object.
+
+121
+00:11:18,060 --> 00:11:22,740
+Then the JSONEmployee object is passed to the save_as_json method.
+
+122
+00:11:24,380 --> 00:11:27,290
+Something similar happens for de-serializing.
+
+123
+00:11:28,540 --> 00:11:33,700
+I've worked on many projects where colleagues protested against this extra object in the middle.
+
+124
+00:11:34,600 --> 00:11:41,110
+I understand them because it seems to be a lot of extra work when all the data attributes for a lot
+
+125
+00:11:41,110 --> 00:11:42,760
+of objects needs to be copied.
+
+126
+00:11:43,720 --> 00:11:51,100
+But if you want to respect the single responsibility principle, the employee object must not know about
+
+127
+00:11:51,100 --> 00:11:51,730
+JSON.
+
+128
+00:11:56,380 --> 00:12:02,830
+There are more examples of violations like this. You'll find them in object relational mapper frameworks.
+
+129
+00:12:04,090 --> 00:12:08,170
+In such frameworks, entities get multiple responsibilities.
+
+130
+00:12:09,830 --> 00:12:10,970
+Like storing data.
+
+131
+00:12:12,470 --> 00:12:14,000
+Provide UI labels.
+
+132
+00:12:15,810 --> 00:12:16,970
+Validate data.
+
+133
+00:12:18,140 --> 00:12:19,890
+And provide error messages.
+
+134
+00:12:20,840 --> 00:12:23,710
+Let me show you an example of such classes.
+
+135
+00:12:26,600 --> 00:12:31,250
+The employee class starts as a business object to store employee data.
+
+136
+00:12:33,260 --> 00:12:37,190
+But suddenly it is also responsible for labels on the screen.
+
+137
+00:12:40,130 --> 00:12:46,970
+And even error messages on the screen. This class is now responsible for many things and violates the
+
+138
+00:12:46,970 --> 00:12:48,860
+single responsibility principle.
+
+139
+00:12:52,370 --> 00:13:00,020
+Conclusion. When the single responsibility principle is violated, your classes get bigger and it gets
+
+140
+00:13:00,020 --> 00:13:04,040
+more risky to change code without affecting other code.
+
+141
+00:13:04,930 --> 00:13:12,340
+Sometimes more subtle violations happen, like in the decorator examples. Keep an eye on the import
+
+142
+00:13:12,340 --> 00:13:17,980
+statements in your classes, they can provide clues for these kinds of violations.
+

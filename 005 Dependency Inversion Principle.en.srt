@@ -1,0 +1,447 @@
+1
+00:00:01,880 --> 00:00:05,130
+Chapter five. Dependency inversion principle.
+
+2
+00:00:05,750 --> 00:00:12,020
+This is the final topic of this course, it provides the mechanism behind most other principles.
+
+3
+00:00:12,770 --> 00:00:14,270
+What is its definition?
+
+4
+00:00:17,400 --> 00:00:21,160
+High level modules should not depend on low level modules.
+
+5
+00:00:21,750 --> 00:00:24,960
+Instead, they should depend on abstractions.
+
+6
+00:00:26,570 --> 00:00:28,280
+This can be difficult to grasp.
+
+7
+00:00:28,760 --> 00:00:30,350
+Let me show you what it means.
+
+8
+00:00:33,000 --> 00:00:34,770
+Your program starts in main.
+
+9
+00:00:36,940 --> 00:00:39,820
+Main calls function f in module M.
+
+10
+00:00:42,360 --> 00:00:45,120
+M calls function g in module N.
+
+11
+00:00:46,660 --> 00:00:51,520
+I have a question for you. Is this an object oriented design?
+
+12
+00:00:53,640 --> 00:00:55,750
+The answer is we don't know.
+
+13
+00:00:56,190 --> 00:00:59,650
+It could be anything, it could be a procedural design.
+
+14
+00:01:00,510 --> 00:01:07,440
+It could be OO. All we know is that high level modules call functions in lower level modules.
+
+15
+00:01:08,830 --> 00:01:12,910
+The higher level modules depend on the lower level modules.
+
+16
+00:01:15,360 --> 00:01:20,150
+In order for main to use module M, main needs to import M.
+
+17
+00:01:22,080 --> 00:01:27,960
+In order for module M to use module N, M needs to import N.
+
+18
+00:01:28,990 --> 00:01:31,870
+We call this a source code dependancy.
+
+19
+00:01:32,900 --> 00:01:39,480
+High level modules know about the lower level modules. They target concrete classes.
+
+20
+00:01:40,370 --> 00:01:42,740
+This design comes with two problems.
+
+21
+00:01:44,930 --> 00:01:46,880
+Concrete classes are volatile.
+
+22
+00:01:48,940 --> 00:01:52,540
+Depending on concrete classes breaks the open-close principle.
+
+23
+00:01:53,870 --> 00:01:55,610
+What does the first problem mean?
+
+24
+00:01:57,190 --> 00:01:58,910
+Concrete things change a lot.
+
+25
+00:01:59,680 --> 00:02:02,860
+Abstract things change much less frequently.
+
+26
+00:02:03,810 --> 00:02:11,100
+If high level modules depend on low level modules, changes in low level modules trigger a recompile
+
+27
+00:02:11,100 --> 00:02:13,230
+in all higher level modules.
+
+28
+00:02:14,520 --> 00:02:20,420
+Historically, this was a problem because of compile times. In 2021
+
+29
+00:02:20,700 --> 00:02:22,620
+this is not a big problem anymore.
+
+30
+00:02:24,650 --> 00:02:26,640
+The second problem is more serious.
+
+31
+00:02:27,590 --> 00:02:29,910
+So where do things start to go wrong?
+
+32
+00:02:32,470 --> 00:02:39,400
+Imagine the software for a cash register. Each time a purchase is made, a receipt is printed.
+
+33
+00:02:43,540 --> 00:02:51,250
+I create a class called Reporting. The class contains a method called print_receipt that takes a string
+
+34
+00:02:51,370 --> 00:02:52,740
+with the receipt text.
+
+35
+00:02:53,380 --> 00:02:56,650
+At this point, we need to send the text to a printer.
+
+36
+00:02:58,870 --> 00:03:04,150
+We will use the internal cash register printer for this. Let's create a class for it.
+
+37
+00:03:07,690 --> 00:03:13,120
+A module printers.py is created and has a class CashRegisterPrinter.
+
+38
+00:03:14,210 --> 00:03:15,800
+How do we use the class?
+
+39
+00:03:18,650 --> 00:03:22,370
+The reporting module needs to import from the printers module.
+
+40
+00:03:24,430 --> 00:03:32,290
+Then it instantiates a new CashRegisterPrinter. This code will work, but we have created a dependency
+
+41
+00:03:32,290 --> 00:03:33,770
+on a concrete class.
+
+42
+00:03:34,810 --> 00:03:38,620
+This is a violation of the dependency inversion principle.
+
+43
+00:03:39,340 --> 00:03:43,660
+And by doing so, it also violates the open-closed principle.
+
+44
+00:03:44,880 --> 00:03:47,520
+Let me demonstrate this by adding a new printer.
+
+45
+00:03:50,040 --> 00:03:55,490
+Instead of printing to the internal cash register printer, a laser printer will be used.
+
+46
+00:03:56,190 --> 00:04:00,240
+Let's create a class for the laser printer in printers.py.
+
+47
+00:04:05,290 --> 00:04:08,200
+printers.py now has two printer classes.
+
+48
+00:04:09,450 --> 00:04:16,380
+One for the internal cash register printer and one for the laser printer. We have extended the software
+
+49
+00:04:16,620 --> 00:04:19,800
+but need to modify existing code to use it.
+
+50
+00:04:21,600 --> 00:04:26,070
+In order to change the printer, the reporting module needs to be changed.
+
+51
+00:04:26,640 --> 00:04:29,440
+This is a violation of the open-closed principle.
+
+52
+00:04:30,060 --> 00:04:35,940
+This time it is caused because we depend on concrete classes instead of on abstractions.
+
+53
+00:04:37,860 --> 00:04:39,620
+So how do we solve the problem?
+
+54
+00:04:40,680 --> 00:04:43,740
+Let me show a dependency diagram of the current code.
+
+55
+00:04:46,260 --> 00:04:47,880
+Main imports Reporting.
+
+56
+00:04:50,300 --> 00:04:52,310
+Reporting imports LaserPrinter.
+
+57
+00:04:53,300 --> 00:04:58,850
+Now you are going to see what inversion means in dependency inversion.
+
+58
+00:05:01,730 --> 00:05:09,710
+The first thing we do is to introduce a printer interface. This interface will just exist in our design.
+
+59
+00:05:10,740 --> 00:05:17,310
+In a dynamic language like Python, we do not physically have to implement interfaces to get polymorphism.
+
+60
+00:05:20,250 --> 00:05:22,920
+LaserPrinter inherits the printer interface.
+
+61
+00:05:24,470 --> 00:05:27,890
+And the reporting module depends on the printer interface.
+
+62
+00:05:31,050 --> 00:05:37,920
+All arrows used to point downwards. Modules depended on lower level modules.
+
+63
+00:05:40,520 --> 00:05:46,880
+But now Reporting depends on an interface, it depends on something abstract.
+
+64
+00:05:48,360 --> 00:05:51,390
+LaserPrinter depends on that same abstraction.
+
+65
+00:05:52,170 --> 00:05:54,660
+This is a break in the dependency chain.
+
+66
+00:05:55,780 --> 00:06:02,470
+It does not matter what happens in LaserPrinter. The reporting module doesn't even know there is such
+
+67
+00:06:02,470 --> 00:06:03,970
+a thing as a laser printer.
+
+68
+00:06:04,720 --> 00:06:09,580
+All it knows is that there is something with a method called print_receipt.
+
+69
+00:06:10,990 --> 00:06:13,060
+So how do we hook this up in Python?
+
+70
+00:06:17,160 --> 00:06:19,920
+Let's start from the top and implement main.
+
+71
+00:06:21,080 --> 00:06:25,640
+The first thing you notice is that all the dependencies are imported here.
+
+72
+00:06:28,660 --> 00:06:31,150
+A LaserPrinter object is instantiated.
+
+73
+00:06:33,000 --> 00:06:38,520
+And then a Reporting object. And this is the place where the printer needs to be injected.
+
+74
+00:06:39,630 --> 00:06:47,040
+To do so, the reporting class gets a class initializer that allows for the printer object to be injected.
+
+75
+00:06:47,730 --> 00:06:48,780
+Let me show the code.
+
+76
+00:06:52,520 --> 00:07:00,110
+A dunder init method is added and the printer argument is stored in self. self.printer now holds
+
+77
+00:07:00,110 --> 00:07:02,300
+an instance of a printer object.
+
+78
+00:07:05,350 --> 00:07:08,710
+This printer object can now be used to print the receipt.
+
+79
+00:07:09,790 --> 00:07:14,870
+Notice there are no imports and no object instantiation is happening here.
+
+80
+00:07:15,280 --> 00:07:18,250
+There is no dependency on a concrete class.
+
+81
+00:07:21,450 --> 00:07:24,720
+We can now pass the printer object to the reporting class.
+
+82
+00:07:26,590 --> 00:07:33,400
+Finally, print_receipt is called on the reporting object. We have now solved the dependency inversion
+
+83
+00:07:33,400 --> 00:07:34,900
+principle violation.
+
+84
+00:07:35,930 --> 00:07:41,200
+And this is the point where we start to benefit when the requirements change.
+
+85
+00:07:43,790 --> 00:07:49,940
+For example, what happens if we switch back to the internal cash register printer?
+
+86
+00:07:51,580 --> 00:07:56,110
+We swap the laser printer for a cash register printer in main.
+
+87
+00:07:57,590 --> 00:08:02,930
+The reporting class does not need to be modified anymore to support another printer.
+
+88
+00:08:07,030 --> 00:08:13,330
+Perhaps you are wondering what we have gained here. We still have to change code to support a new printer.
+
+89
+00:08:14,190 --> 00:08:14,970
+That's true.
+
+90
+00:08:15,430 --> 00:08:22,850
+The open-closed principle does not prevent code modification, but it confines it to specific places.
+
+91
+00:08:23,490 --> 00:08:29,660
+Main is an excellent place to create the dependency tree that will be used in the rest of the program.
+
+92
+00:08:32,760 --> 00:08:39,430
+If you are worried about an explosion of import statements in main, there are techniques to help preventing
+
+93
+00:08:39,450 --> 00:08:39,750
+that.
+
+94
+00:08:42,430 --> 00:08:43,970
+You can use factories.
+
+95
+00:08:44,830 --> 00:08:51,130
+A factory is an object that creates new objects. That way you can move the logic out of main and into
+
+96
+00:08:51,130 --> 00:08:51,820
+a factory.
+
+97
+00:08:52,540 --> 00:08:58,270
+If you are interested in this, you could watch my course on the Python object model where I show an
+
+98
+00:08:58,270 --> 00:08:59,650
+example of a factory.
+
+99
+00:09:02,470 --> 00:09:09,130
+Some people like to use IOC container frameworks to manage the dependencies for them. The dependency
+
+100
+00:09:09,130 --> 00:09:14,230
+tree is configured in a config file and resolved by the framework when needed.
+
+101
+00:09:16,940 --> 00:09:23,600
+Personally, I favor writing out the dependency tree in source code. This gives me full control over
+
+102
+00:09:23,600 --> 00:09:26,450
+the life span of each and every object in the code.
+
+103
+00:09:27,880 --> 00:09:35,050
+As always, there is a solution for each scenario and you have to find out what works best for you.
+
+104
+00:09:38,890 --> 00:09:45,640
+Conclusion. The dependency inversion principle is the mechanism behind many of the other principles.
+
+105
+00:09:46,180 --> 00:09:48,430
+Especially the open-closed principle.
+
+106
+00:09:49,500 --> 00:09:55,130
+It allows us to depend on interfaces rather than upon concrete classes.
+
+107
+00:09:57,600 --> 00:10:01,950
+The symptoms of violations of the dependency inversion principle are
+
+108
+00:10:03,130 --> 00:10:09,940
+Object instantiation in lower level modules and the import statements needed for these instantiations.
+
+109
+00:10:11,910 --> 00:10:15,540
+These violations can be solved by injecting dependencies.
+
+110
+00:10:18,780 --> 00:10:24,660
+And that concludes the last chapter of this course. You have now seen the five S.O.L.I.D. principles.
+
+111
+00:10:25,170 --> 00:10:27,710
+Now let's look at the principles as a whole.
+
+112
+00:10:28,440 --> 00:10:30,540
+What are the main lessons to be learned?

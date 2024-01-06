@@ -1,0 +1,271 @@
+1
+00:00:01,920 --> 00:00:09,840
+Chapter two. Open-closed principle. This principle causes a lot of confusion for developers who first
+
+2
+00:00:09,840 --> 00:00:10,350
+hear it.
+
+3
+00:00:12,480 --> 00:00:17,010
+Open-closed means open for extension, but closed for modification.
+
+4
+00:00:18,050 --> 00:00:20,130
+That might even make it more confusing.
+
+5
+00:00:20,750 --> 00:00:24,070
+How can a program be extended if you cannot change it?
+
+6
+00:00:25,040 --> 00:00:29,400
+Surely you have to modify existing code to add new functionality.
+
+7
+00:00:30,380 --> 00:00:37,160
+Yes, but if you stick to this principle, the changes do not explode into all directions.
+
+8
+00:00:42,650 --> 00:00:50,330
+Perhaps you recognize code like this. This is a selection that switches on object types. The reason
+
+9
+00:00:50,330 --> 00:00:52,840
+to use the open-closed principle is easy.
+
+10
+00:00:53,390 --> 00:00:55,640
+It prevents switches like this.
+
+11
+00:00:56,570 --> 00:00:58,420
+Why is this important?
+
+12
+00:01:00,720 --> 00:01:06,720
+First, I'll show you how a selection on types violates the open closed principle and how to solve
+
+13
+00:01:06,720 --> 00:01:06,930
+it.
+
+14
+00:01:08,630 --> 00:01:14,210
+Then I show how easy it is to add new functionality when we adhere to the principle.
+
+15
+00:01:15,990 --> 00:01:22,620
+Finally, I will remove existing functionality to show how we can do it with the least amount of risk.
+
+16
+00:01:25,100 --> 00:01:27,800
+Let me start by showing you problematic code.
+
+17
+00:01:30,420 --> 00:01:35,400
+Here is a base class called Employee, it stores an employee name.
+
+18
+00:01:38,500 --> 00:01:45,160
+Look at the print_employee function, it takes a reference to an object of type employee. It prints the
+
+19
+00:01:45,160 --> 00:01:46,290
+name of the employee.
+
+20
+00:01:47,200 --> 00:01:48,760
+So far, so good.
+
+21
+00:01:49,870 --> 00:01:53,470
+Now the system needs to be extended with a manager class.
+
+22
+00:01:57,590 --> 00:02:02,810
+A manager inherits from employee and adds an attribute: department.
+
+23
+00:02:07,190 --> 00:02:09,860
+Here is the code that adds the manager class.
+
+24
+00:02:10,840 --> 00:02:17,830
+Manager inherits from employee and adds an extra attribute to the object: department.
+
+25
+00:02:18,840 --> 00:02:23,070
+I overload the initializer to support the department attribute.
+
+26
+00:02:26,920 --> 00:02:32,120
+At this point, e can be an object of type employee or manager.
+
+27
+00:02:32,890 --> 00:02:37,750
+We know that e has a name, but we don't know if e has a department.
+
+28
+00:02:40,880 --> 00:02:45,430
+The print_employee function needs a switch to check the type of e.
+
+29
+00:02:46,410 --> 00:02:51,870
+In order to check for the type, the switch needs to know all possible employee types.
+
+30
+00:02:56,430 --> 00:03:02,190
+When the print_employee function is moved to a different module, this problem becomes even more visible
+
+31
+00:03:02,460 --> 00:03:06,180
+because to know every employee type, they need to be imported.
+
+32
+00:03:10,050 --> 00:03:16,530
+And this switch can be in multiple places. Every time a new employee subclass is created, you have
+
+33
+00:03:16,530 --> 00:03:18,840
+to change the code in all those places.
+
+34
+00:03:19,590 --> 00:03:26,820
+It now becomes very clear that we cannot extend the functionality without changing existing working
+
+35
+00:03:26,820 --> 00:03:27,270
+code.
+
+36
+00:03:28,720 --> 00:03:33,880
+And there is the risk of changing the code in one place, but forget it in another place.
+
+37
+00:03:34,720 --> 00:03:38,650
+This example is a violation of the open-closed principle.
+
+38
+00:03:41,910 --> 00:03:48,780
+The good news is that it is a solvable problem. And the technique to solve the problem is polymorphism.
+
+39
+00:03:50,170 --> 00:03:56,140
+The employee will get a new method called get_info that returns employee information.
+
+40
+00:03:58,050 --> 00:04:02,670
+The manager will override this method to return manager information.
+
+41
+00:04:07,110 --> 00:04:08,760
+This is how the code looks like.
+
+42
+00:04:10,960 --> 00:04:14,770
+get_info in the employee class returns the employee name.
+
+43
+00:04:16,740 --> 00:04:21,060
+get_info in the manager class returns the name plus department.
+
+44
+00:04:23,990 --> 00:04:29,060
+The print_employee function does not have to know anymore what type e is.
+
+45
+00:04:30,410 --> 00:04:37,550
+All it needs to do is to make a polymorphic call  to get_info, to get the proper employee information.
+
+46
+00:04:41,770 --> 00:04:49,060
+You just saw how switching on object types violates the open-closed principle. You also saw how to
+
+47
+00:04:49,060 --> 00:04:51,520
+solve the problem with polymorphism.
+
+48
+00:04:53,480 --> 00:04:57,560
+At this point, extending functionality becomes very easy.
+
+49
+00:04:59,590 --> 00:05:07,180
+Let me add a new employee type to the system. The employee type is a programmer. It inherits from
+
+50
+00:05:07,180 --> 00:05:11,830
+employee and adds an extra attribute called programming_language.
+
+51
+00:05:14,910 --> 00:05:21,810
+Since we adhere to the open closed principle, all we need to do is to add a new class that overloads
+
+52
+00:05:21,810 --> 00:05:23,670
+the get_info method properly.
+
+53
+00:05:28,230 --> 00:05:35,880
+And instead of having to add an extra case to check if the type of e is programmer, we did not have
+
+54
+00:05:35,880 --> 00:05:38,670
+to change to print_employee function at all.
+
+55
+00:05:39,730 --> 00:05:45,310
+And that is what we call open for extension, closed for modification.
+
+56
+00:05:49,090 --> 00:05:55,240
+Another huge benefit of working with the open-closed principle is that removing functionality can be
+
+57
+00:05:55,240 --> 00:05:56,980
+done relatively safe.
+
+58
+00:05:59,460 --> 00:06:06,270
+Let's say that the company finally realized it does not really need managers and asks you to remove
+
+59
+00:06:06,270 --> 00:06:09,930
+everything that has something to do with manager objects.
+
+60
+00:06:12,720 --> 00:06:18,270
+You don't have to think about this too long. Since there are no switches in the code, that check for
+
+61
+00:06:18,270 --> 00:06:21,990
+the manager object type, you can just delete the manager class.
+
+62
+00:06:23,780 --> 00:06:29,150
+Perhaps you will have to clean up some places where managers were instantiated in the code, but that
+
+63
+00:06:29,150 --> 00:06:34,730
+is as easy as running the code and see what errors occur when the code is compiled.
+
+64
+00:06:38,270 --> 00:06:44,300
+And that's it, you just learned one of the most important principles in software engineering.
+
+65
+00:06:47,130 --> 00:06:53,850
+Whenever you see if-else statements or switches that select on object types, you might be looking at
+
+66
+00:06:53,850 --> 00:06:56,430
+a violation of the open-closed principle.
+
+67
+00:06:57,270 --> 00:07:04,130
+The open-closed principle is one of my favorites and is closely related to the next principle, the
+
+68
+00:07:04,140 --> 00:07:06,510
+Liskov substitution principle.
