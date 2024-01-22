@@ -1,5 +1,5 @@
 # Create directories
-mkdir Chapter01 Chapter02 Chapter03 Chapter04
+1..4 | ForEach-Object { New-Item -ItemType Directory -Path ("Chapter{0:D2}" -f $_) -Force }
 
 # Create virtual environment
 python -m venv venv
